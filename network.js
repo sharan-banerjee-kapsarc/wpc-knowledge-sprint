@@ -4,11 +4,14 @@
   const actors = ['Oil producers', 'Pipeline company', 'Power utility', 'Energy ministry',
     'Finance ministry', 'Lender', 'Affected communities', 'Contractors'];
 
-  function calculate(scores) {
+  function calculate(scores, active = actors.map((_, i) => i)) {
     if (!Array.isArray(scores) || scores.length !== 28 || scores.some(v =>
       v !== null && (!Number.isInteger(v) || v < 0 || v > 100))) {
       throw Error('Use 28 whole-number scores from 0 to 100, or leave cells blank.');
     }
+    if (!Array.isArray(active) || active.some(i => !Number.isInteger(i) || i < 0 || i >= actors.length) ||
+        new Set(active).size !== active.length) throw Error('Choose each remaining actor once.');
+    const included = new Set(active), count = active.length;
     const n = actors.length, adjacency = actors.map(() => []), strength = Array(n).fill(0), edges = [];
     // Put reciprocal scores on a common integer scale. BigInt preserves equal
     // shortest paths exactly, including ties involving different edge weights.
@@ -20,7 +23,7 @@
     let k = 0;
     for (let i = 0; i < n; i++) for (let j = 0; j < i; j++) {
       const value = scores[k++];
-      if (value > 0) {
+      if (value > 0 && included.has(i) && included.has(j)) {
         const length = scale / BigInt(value);
         adjacency[i].push({node:j, length, weight:value});
         adjacency[j].push({node:i, length, weight:value});
@@ -61,11 +64,11 @@
       }
     }
     for (let i = 0; i < n; i++) bw[i] /= 2;
-    const connected = componentSizes[0] === n;
+    const connected = count > 0 && componentSizes[active[0]] === count;
     let eigen = Array(n).fill(null);
-    if (connected) {
+    if (connected && count > 1) {
       const shift = Math.max(...strength);
-      let vector = Array(n).fill(1 / Math.sqrt(n)), converged = false;
+      let vector = actors.map((_,i) => included.has(i) ? 1 / Math.sqrt(count) : 0), converged = false;
       for (let iteration = 0; iteration < 20000; iteration++) {
         let next = vector.map((v,i) => shift*v + adjacency[i].reduce((sum,e) => sum + e.weight*vector[e.node], 0));
         const norm = Math.sqrt(next.reduce((sum,v) => sum + v*v, 0));
@@ -78,9 +81,12 @@
       const maximum = Math.max(...vector); eigen = vector.map(v => v / maximum);
     }
     return {actors:[...actors], edges, connected, completed:scores.filter(v => v !== null).length,
-      total:28, distance_mode:'inverse', zero_links:'excluded',
-      metrics:actors.map((name,i) => ({name, degree:strength[i], closeness:clNorm[i], cl_raw:clRaw[i],
-        betweenness:bw[i], bw_norm:2*bw[i]/((n-1)*(n-2)), eigenvector:eigen[i], component_size:componentSizes[i]}))};
+      total:28, distance_mode:'inverse', zero_links:'excluded', active_count:count, active:[...active].sort((a,b)=>a-b),
+      metrics:actors.map((name,i) => ({name, active:included.has(i), degree:included.has(i)?strength[i]:null,
+        closeness:included.has(i)?clNorm[i]:null, cl_raw:included.has(i)?clRaw[i]:null,
+        betweenness:included.has(i)?bw[i]:null,
+        bw_norm:included.has(i)?(count>2?2*bw[i]/((count-1)*(count-2)):0):null,
+        eigenvector:included.has(i)?eigen[i]:null, component_size:included.has(i)?componentSizes[i]:null}))};
   }
   root.WPCNetwork = Object.freeze({actors:Object.freeze(actors), calculate});
 })(globalThis);

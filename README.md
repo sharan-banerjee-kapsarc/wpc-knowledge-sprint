@@ -1,6 +1,4 @@
-# WPC 2026 Knowledge Sprint
-
-### Session hosted by Emre Hatipoglu, Sharan Banerjee, Khwlah Almutair and Ales Marsal
+# WPC Knowledge Sprint
 
 ## The gas nobody can use
 
@@ -72,7 +70,7 @@ Intermediate scores are allowed. A blank cell means the group has not yet made a
 
 **Circle size shows actor power. Line thickness shows the relationship score.** A small dashed circle means power is still unscored. A power score of zero produces a small solid circle, so every actor remains visible.
 
-The measure menu highlights the actor or actors with the highest selected centrality. Click an actor to follow its links, drag a circle to move its label, or select **Show all links** to clear the selection. The layout does not represent geography or organisational hierarchy.
+The measure menu highlights the actor or actors with the highest selected centrality. Click an actor to follow its links, drag a circle to arrange the graph, or select **Clear actor selection** to clear the selection. The layout does not represent geography or organisational hierarchy.
 
 | Measure | What it describes | Question for the group |
 | --- | --- | --- |
@@ -84,6 +82,30 @@ The measure menu highlights the actor or actors with the highest selected centra
 Power and centrality are separate judgments. An actor can have considerable authority or control over resources while having relatively few coordination links. Another actor can connect many stakeholders while having limited formal authority.
 
 The scores reflect the group's interpretation of a fictional case. The map does not establish observed information flows, predict construction outcomes, or determine an actor's rights. A low score or low centrality does not remove a legitimate concern from the policy decision.
+
+### Exploring the graph
+
+Use these controls after discussing the group's first map. They help test assumptions while retaining the agreed relationship and power scores.
+
+| Control | How to use it | Effect on the results |
+| --- | --- | --- |
+| **Hide actors below a score** | Choose actor power or a centrality measure, then set the minimum score with the slider or value box | Hides actors and their links in the graph; centralities remain unchanged |
+| **Hide links below a score** | Set the minimum relationship score, from 0 to 100 | Hides weaker links in the graph; centralities remain unchanged |
+| **Arrange nodes** | Choose Circle, Square, Grid, Automatic, or Free dragging | Moves nodes and their connecting lines; scores and centralities remain unchanged |
+| **Remove actors and recalculate** | Tick actors to exclude them, or click a circle and select **Remove selected actor** | Excludes those actors and their links, then recalculates the remaining network |
+| **Remove hidden actors** | Apply an actor filter, then remove the actors hidden by that filter | Turns the current hidden set into a removal experiment; results are recalculated |
+
+Scores **at or above** the chosen threshold stay visible. At an actor threshold of zero, every remaining actor is shown, including actors whose chosen value is unscored or unavailable. Above zero, those unavailable values are hidden. Link thresholds apply to relationship scores; zero and blank relationships never create links.
+
+Actor power and centrality use different scales. Power ranges from 0 to 100, weighted degree from 0 to 700, eigenvector from 0 to 1, closeness from 0 to 100 under this activity's reciprocal distances, and raw betweenness from 0 to 21 for eight actors. The controls show the scale for the selected measure. The filter is applied once to the current calculated results; hiding an actor does not trigger further removals.
+
+The status above the graph distinguishes a **full assessment** from a **removal experiment**, lists excluded actors, and reports how many actors and positive links are shown. The results table includes every actor remaining in the calculation, even when the view filter hides it. Hidden rows are labelled. A graph that appears disconnected after filtering can still have connected paths in the calculation.
+
+Untick an actor or select **Restore all actors** to reverse removals. **Clear filter** resets the actor cutoff; **Clear link filter** resets the relationship cutoff. **Reset layout** returns the visible actors to a circle. **Reset exploration** restores all actors, clears both filters, and returns to the circle. These controls retain all scores, saved assessments, and notes.
+
+Free dragging lets the group make its own clusters and shapes. The connecting lines follow each node. Choosing Automatic arranges the visible nodes using attraction along visible links and repulsion between nodes. Stronger visible links have shorter target lengths. Positions describe an arrangement for discussion, not geography, authority, or an additional centrality measure. Dragging switches the layout to Free dragging.
+
+Exploration settings belong to the group and are applied to whichever assessment is being viewed. When comparing first and revised assessments, use the same filters and exclusions, or reset exploration to compare both complete networks. A removal experiment tests the consequences of an assumed absence; it does not justify excluding an actor from consultation or policy decisions.
 
 ### Questions for the debrief
 
@@ -99,17 +121,17 @@ Entries are saved automatically in the browser on the activity's site address wh
 
 | Control | Download or action |
 | --- | --- |
-| **Save group file** | A JSON file containing the group's first and revised relationship scores, power scores, and notes |
+| **Save group file** | A JSON file containing both rounds' relationship and power scores, notes, and exploration settings |
 | **Open group file** | Opens a saved assessment on this or another computer |
 | **Download matrix** | A CSV file for the currently viewed round, with actor name, power, and eight relationship columns |
-| **Download centralities** | A CSV file containing actor power and the calculated network measures for the viewed round |
-| **Download network** | An SVG image of the current graph for use in slides or reports |
+| **Download centralities** | A CSV file containing power and centralities for all actors remaining in the viewed round, labelled as a full assessment or removal experiment |
+| **Download network** | An SVG image of the displayed graph, including filters and node positions, labelled with assessment round and experiment status |
 
 Downloads use the browser's usual download location. The application does not send participants' scores to GitHub, the facilitator, or a central database. The facilitator can collect JSON files and open them one at a time to compare groups. Shared editing and automatic submission collection are not part of this version.
 
 Keep the published address the same during the session. A local file, a localhost address, and the published site have separate browser storage. Use a group file to move results between them.
 
-Older group files remain compatible. Missing power values stay blank. If an older first assessment was already saved, its historical power remains unscored; power can be entered for the revised assessment after the lender update. New groups require all eight power scores before saving the first assessment. Older CSV import routines may need adjusting for the added power column.
+Version 1 and version 2 group files remain compatible. Files without exploration settings open with all actors included, no filters, and the circle layout. Missing power values stay blank. If an older first assessment was already saved, its historical power remains unscored; power can be entered for the revised assessment after the lender update. New groups require all eight power scores before saving the first assessment. Older CSV import routines may need adjusting for the added power column.
 
 ## Technical notes
 
@@ -126,15 +148,21 @@ The JavaScript implementation scales reciprocal distances to common integers usi
 ### Centrality calculations
 
 - **Weighted degree** is the sum of positive relationship scores incident to an actor. Its possible range is 0–700.
-- **Eigenvector centrality** uses the weighted adjacency matrix. The highest value in each assessment is scaled to 1. Power iteration uses a diagonal shift equal to the highest weighted degree to avoid cycling in bipartite graphs. It stops when the largest change in the unit vector falls below `1e-13`, with a limit of 20,000 iterations. Eigenvector results are withheld when the network is disconnected.
+- **Eigenvector centrality** uses the weighted adjacency matrix. The highest value in each assessment is scaled to 1. Power iteration uses a diagonal shift equal to the highest weighted degree to avoid cycling in bipartite graphs. It stops when the largest change in the unit vector falls below `1e-13`, with a limit of 20,000 iterations. Eigenvector results are withheld when the calculated network is disconnected or has fewer than two actors. Removed actors are excluded from both the adjacency matrix and normalisation.
 - **Closeness** is the number of other reachable actors divided by the sum of shortest-path distances to them. The CSV also includes `cl_raw`, the reciprocal of that distance sum. Isolated actors have no closeness value. Values are calculated within each actor's reachable set, without an additional correction for component size; closeness across separate connected sets should be read with that limitation in mind.
-- **Betweenness** sums an actor's share of shortest paths between all unordered pairs of other actors. The table displays the unnormalised value. The CSV also includes `bw_norm = 2 × betweenness / [(n − 1)(n − 2)]`; here `n = 8`.
+- **Betweenness** sums an actor's share of shortest paths between all unordered pairs of other actors. The table displays the unnormalised value. The CSV also includes `bw_norm = 2 × betweenness / [(n − 1)(n − 2)]`. Here `n = 8` for the full assessment, or the number of remaining actors in a removal experiment. With fewer than three actors, normalised betweenness is zero.
+
+### Removal experiments and view filters
+
+A removal experiment calculates the induced network of the remaining actors: retained links keep their original scores, and no replacement links are invented. The eight-actor scoring matrix and both saved assessments remain intact. Degree, shortest paths, reachable sets, and eigenvector are recalculated using only the remaining actors. Empty and singleton networks are supported; undefined values appear as a dash.
+
+Actor and link thresholds are display filters applied after this calculation. They do not alter weights, path calculations, or table rankings. Centrality filters use the current calculated measures, including any active removal experiment. Automatic layout uses a deterministic force arrangement followed by uniform scaling to fit the graph; its visible links govern attraction, but distances in that arrangement are not used for centrality calculations.
 
 ### Visual scales and comparison between rounds
 
 Circle area increases linearly with the power score above a minimum visible area. For power `p` from 0 to 100, the radius in SVG coordinate units is `sqrt(144 + 16.2 × p)`: 12 at power 0 and 42 at power 100. Unscored power uses radius 12 with a dashed border.
 
-Line width is `0.8 + 0.055 × w` in SVG coordinate units for positive relationship score `w`. Both visual scales are fixed across assessments. Actor positions remain stable during comparison within the page, unless a participant drags them; dragged positions are not saved in the group file.
+Line width is `0.8 + 0.055 × w` in SVG coordinate units for positive relationship score `w`. Both visual scales are fixed across assessments. Actor positions, both view thresholds, the chosen layout, and excluded actors are saved with the group. Circle, Square, and Grid arrange the actors currently visible. Automatic recomputes its arrangement when scores or filters change; Free dragging retains manually chosen positions.
 
 Each round retains its own relationship and power scores. Eigenvector is rescaled separately in each round, so changes in its displayed value should be interpreted alongside changes in the network and ranking.
 
@@ -148,9 +176,9 @@ The GitHub Pages version runs in a current browser using HTML, CSS, and JavaScri
 | [network.js](network.js) | Score validation and network calculations |
 | [README.md](README.md) | Case overview, participant guidance, methods, and hosting instructions |
 
-The downloadable group format is version 2 and includes both rounds' power scores. The application also accepts version 1 group files. CSV files are UTF-8 with a byte-order mark for Excel; SVG files retain scalable vector shapes.
+The downloadable group format is version 3. It retains both rounds' relationship and power scores and adds `group.exploration`: excluded actor indices, actor filter measure and threshold, link threshold, layout, and eight node positions. Versions 1 and 2 remain accepted; no original scores are discarded during migration. CSV files are UTF-8 with a byte-order mark for Excel. Centrality CSVs add `assessment_round`, `network_scope`, and `excluded_actors`; a removal experiment includes only remaining actors. View filters do not remove rows from that CSV. Matrix CSVs always retain all eight actors and their original scores for the selected round. SVG files retain scalable vector shapes and include the visible graph and a scope label.
 
-The browser calculations were checked against the local Python implementation across 105 matrices, including connected, disconnected, empty, all-zero, and equal-shortest-path cases. Browser checks covered power-based circle sizes, score validation, preservation of the first assessment, revised scores after reloading, JSON/CSV/SVG downloads, and older group-file imports. These checks verify software behaviour; they do not validate participants' policy judgments.
+The browser calculations were checked against the local Python implementation across 105 matrices, including connected, disconnected, empty, all-zero, and equal-shortest-path cases. Browser checks covered power-based circle sizes, score validation, preservation of the first assessment, revised scores after reloading, JSON/CSV/SVG downloads, and older group-file imports. Removal calculations were also checked in 102 cases, including removal of a bridge, empty and singleton networks, and comparisons with igraph. Browser checks covered actor and link filters, layouts, reversible removals, saved exploration settings, and labelled exports. These checks verify software behaviour; they do not validate participants' policy judgments.
 
 For background on the measures, see the [igraph centrality reference](https://python.igraph.org/en/latest/api/igraph.GraphBase.html) and [NetworkX documentation on weighted betweenness](https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.centrality.betweenness_centrality.html). The conventions above describe this implementation.
 
