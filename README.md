@@ -12,7 +12,7 @@ Each table acts as an advisory group to an energy ministry. Participants score t
 
 ### Acknowledgements
 
-The underlying activity draws on material from **Mehmet Emre Hatipoglu** and **Aseem Kumar Mahajan**, who are acknowledged as sources for the stakeholder mapping exercise. This fictional gas-capture case and browser implementation adapt that activity for the WPC Knowledge Sprint.
+The underlying activity draws on material from **Mehmet Emre Hatipoglu** and **Aseem Kumar Mahajan**. This fictional gas-capture case and browser implementation adapt that activity for the WPC Knowledge Sprint.
 
 ## The policy case
 
