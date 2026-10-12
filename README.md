@@ -12,7 +12,7 @@ Each table acts as an advisory group to an energy ministry. Participants score t
 
 ### Acknowledgements
 
-The underlying activity draws on material from **Mehmet Emre Hatipoglu** and **Aseem Kumar Mahajan**. This fictional gas-capture case and browser implementation adapt that activity for the WPC Knowledge Sprint.
+The underlying activity draws on material from **Mehmet Emre Hatipoglu** and **Aseem Kumar Mahajan**, who are acknowledged as sources for the stakeholder mapping exercise. This fictional gas-capture case and browser implementation adapt that activity for the WPC Knowledge Sprint.
 
 ## The policy case
 
@@ -91,7 +91,7 @@ Use these controls after discussing the group's first map. They help test assump
 | --- | --- | --- |
 | **Hide actors below a score** | Choose actor power or a centrality measure, then set the minimum score with the slider or value box | Hides actors and their links in the graph; centralities remain unchanged |
 | **Hide links below a score** | Set the minimum relationship score, from 0 to 100 | Hides weaker links in the graph; centralities remain unchanged |
-| **Arrange nodes** | Choose Circle, Square, Grid, Automatic, or Free dragging | Moves nodes and their connecting lines; scores and centralities remain unchanged |
+| **Arrange nodes** | Choose a 2D or 3D arrangement, or Free dragging | Moves nodes and their connecting lines; scores and centralities remain unchanged |
 | **Remove actors and recalculate** | Tick actors to exclude them, or click a circle and select **Remove selected actor** | Excludes those actors and their links, then recalculates the remaining network |
 | **Remove hidden actors** | Apply an actor filter, then remove the actors hidden by that filter | Turns the current hidden set into a removal experiment; results are recalculated |
 
@@ -101,11 +101,26 @@ Actor power and centrality use different scales. Power ranges from 0 to 100, wei
 
 The status above the graph distinguishes a **full assessment** from a **removal experiment**, lists excluded actors, and reports how many actors and positive links are shown. The results table includes every actor remaining in the calculation, even when the view filter hides it. Hidden rows are labelled. A graph that appears disconnected after filtering can still have connected paths in the calculation.
 
-Untick an actor or select **Restore all actors** to reverse removals. **Clear filter** resets the actor cutoff; **Clear link filter** resets the relationship cutoff. **Reset layout** returns the visible actors to a circle. **Reset exploration** restores all actors, clears both filters, and returns to the circle. These controls retain all scores, saved assessments, and notes.
+Untick an actor or select **Restore all actors** to reverse removals. **Clear filter** resets the actor cutoff; **Clear link filter** resets the relationship cutoff. **Reset layout** returns the visible actors to a circle in 2D or a sphere in 3D. **Reset exploration** restores all actors, clears both filters, and restores the starting layout and camera in the chosen view. These controls retain all scores, saved assessments, and notes.
 
 Free dragging lets the group make its own clusters and shapes. The connecting lines follow each node. Choosing Automatic arranges the visible nodes using attraction along visible links and repulsion between nodes. Stronger visible links have shorter target lengths. Positions describe an arrangement for discussion, not geography, authority, or an additional centrality measure. Dragging switches the layout to Free dragging.
 
 Exploration settings belong to the group and are applied to whichever assessment is being viewed. When comparing first and revised assessments, use the same filters and exclusions, or reset exploration to compare both complete networks. A removal experiment tests the consequences of an assumed absence; it does not justify excluding an actor from consultation or policy decisions.
+
+### Using the 3D view
+
+Choose **3D** under **Graph view**. New groups start in 3D; previously saved groups keep the 2D view until you change it. Both views use the same assessment, filters, exclusions, and centrality results.
+
+- Drag empty space in the graph to rotate the network.
+- Scroll over the graph, or use **+ Zoom** and **− Zoom**, to change the scale. On a touch screen, use the zoom buttons.
+- Drag an actor to move it across the current view. Its connecting lines follow it. This switches the arrangement to **Free dragging**.
+- Choose **Sphere**, **Cube**, **Layered grid**, or **Automatic** to arrange the actors in three dimensions. In 2D, the equivalent choices are Circle, Square, Grid, and Automatic.
+- Select **Reset 3D view** to restore the starting angle and zoom. This keeps node positions, filters, scores, and removals.
+- For keyboard rotation, focus the graph and use the arrow keys. Use `+` or `−` to zoom.
+
+The spheres retain their power-based size as the graph turns. Moving an actor closer to the viewer does not make it larger. Zoom scales every node equally. The faint box and axes help show the rotation; neither position nor depth represents authority, geography, or another measure of influence. If labels overlap at one angle, rotate the graph, move a node, or switch to 2D.
+
+**Save group file** retains the chosen view, angle, zoom, and both sets of node positions. **Download network** saves an SVG of the currently displayed angle; the image is static. Open the group file in the activity to continue rotating and editing the network.
 
 ### Questions for the debrief
 
@@ -160,11 +175,13 @@ Actor and link thresholds are display filters applied after this calculation. Th
 
 ### Visual scales and comparison between rounds
 
-Circle area increases linearly with the power score above a minimum visible area. For power `p` from 0 to 100, the radius in SVG coordinate units is `sqrt(144 + 16.2 × p)`: 12 at power 0 and 42 at power 100. Unscored power uses radius 12 with a dashed border.
+Circle area increases linearly with the power score above a minimum visible area. For power `p` from 0 to 100, the radius in SVG coordinate units is `sqrt(144 + 16.2 × p)`: 12 at power 0 and 42 at power 100, before camera zoom in 3D. Unscored power uses radius 12 with a dashed border.
 
 Line width is `0.8 + 0.055 × w` in SVG coordinate units for positive relationship score `w`. Both visual scales are fixed across assessments. Actor positions, both view thresholds, the chosen layout, and excluded actors are saved with the group. Circle, Square, and Grid arrange the actors currently visible. Automatic recomputes its arrangement when scores or filters change; Free dragging retains manually chosen positions.
 
 Each round retains its own relationship and power scores. Eigenvector is rescaled separately in each round, so changes in its displayed value should be interpreted alongside changes in the network and ranking.
+
+The 3D display stores actual x, y, and z coordinates and rotates them around two axes. It uses orthographic projection into SVG, with depth ordering and shaded spheres. There is no perspective size scaling: power-based node area is independent of depth. Camera zoom scales node radii and the arrangement together. Node dragging moves an actor in the camera plane while retaining its depth in that view, subject to coordinate bounds. The 3D Automatic layout uses attraction along visible links and repulsion in three dimensions. Geometry does not enter any centrality calculation. Both views work offline without an external graphics library or WebGL requirement.
 
 ### Software, files, and verification
 
@@ -176,9 +193,9 @@ The GitHub Pages version runs in a current browser using HTML, CSS, and JavaScri
 | [network.js](network.js) | Score validation and network calculations |
 | [README.md](README.md) | Case overview, participant guidance, methods, and hosting instructions |
 
-The downloadable group format is version 3. It retains both rounds' relationship and power scores and adds `group.exploration`: excluded actor indices, actor filter measure and threshold, link threshold, layout, and eight node positions. Versions 1 and 2 remain accepted; no original scores are discarded during migration. CSV files are UTF-8 with a byte-order mark for Excel. Centrality CSVs add `assessment_round`, `network_scope`, and `excluded_actors`; a removal experiment includes only remaining actors. View filters do not remove rows from that CSV. Matrix CSVs always retain all eight actors and their original scores for the selected round. SVG files retain scalable vector shapes and include the visible graph and a scope label.
+The downloadable group format remains version 3, with optional 3D fields. It retains both rounds' relationship and power scores and adds `group.exploration`: excluded actor indices, actor filter measure and threshold, link threshold, layout, eight 2D node positions, `dimension` (`2d` or `3d`), `positions3d` (eight sets of x, y, z coordinates), and `camera` (yaw, pitch, zoom). Versions 1 and 2 remain accepted; no original scores are discarded during migration. CSV files are UTF-8 with a byte-order mark for Excel. Centrality CSVs add `assessment_round`, `network_scope`, and `excluded_actors`; a removal experiment includes only remaining actors. View filters do not remove rows from that CSV. Matrix CSVs always retain all eight actors and their original scores for the selected round. SVG files retain scalable vector shapes and include the visible graph and a scope label.
 
-The browser calculations were checked against the local Python implementation across 105 matrices, including connected, disconnected, empty, all-zero, and equal-shortest-path cases. Browser checks covered power-based circle sizes, score validation, preservation of the first assessment, revised scores after reloading, JSON/CSV/SVG downloads, and older group-file imports. Removal calculations were also checked in 102 cases, including removal of a bridge, empty and singleton networks, and comparisons with igraph. Browser checks covered actor and link filters, layouts, reversible removals, saved exploration settings, and labelled exports. These checks verify software behaviour; they do not validate participants' policy judgments.
+The browser calculations were checked against the local Python implementation across 105 matrices, including connected, disconnected, empty, all-zero, and equal-shortest-path cases. Browser checks covered power-based circle sizes, score validation, preservation of the first assessment, revised scores after reloading, JSON/CSV/SVG downloads, and older group-file imports. Removal calculations were also checked in 102 cases, including removal of a bridge, empty and singleton networks, and comparisons with igraph. Browser checks covered actor and link filters, layouts, reversible removals, saved exploration settings, and labelled exports. The 3D checks covered rotation, zoom, node dragging, unchanged calculation results across views, retained filters and removals, saved angles and positions, and SVG exports. Geometry checks covered rotation inverses, coordinate bounds, all four arrangements with zero to eight actors, and compatibility with older group files. These checks verify software behaviour; they do not validate participants' policy judgments.
 
 For background on the measures, see the [igraph centrality reference](https://python.igraph.org/en/latest/api/igraph.GraphBase.html) and [NetworkX documentation on weighted betweenness](https://networkx.org/documentation/stable/reference/algorithms/generated/networkx.algorithms.centrality.betweenness_centrality.html). The conventions above describe this implementation.
 
