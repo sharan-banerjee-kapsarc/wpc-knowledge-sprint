@@ -1,4 +1,6 @@
-# WPC Knowledge Sprint
+# WPC 2026 Knowledge Sprint
+
+### Session hosted by Emre Hatipoglu, Sharan Banerjee, Khwlah Almutair and Ales Marsal
 
 ## The gas nobody can use
 
