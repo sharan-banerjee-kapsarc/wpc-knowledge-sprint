@@ -2,7 +2,7 @@
 
 ## The gas nobody can use
 
-A group exercise on stakeholder coordination, actor power, and the delivery of energy policy, prepared for the World Petroleum Congress Knowledge Sprint hosted by KAPSARC.
+A group exercise on stakeholder coordination, actor power, and the delivery of energy policy, prepared for the World Petroleum Congress Knowledge Sprint hosted by KAPSARC. This builds directly on prior work and material developed by Aseem Kumar Mahajan and Mehmet Emre Hatipoglu at the KAPSARC School of Public Policy. 
 
 [**Open the activity**](https://sharan-banerjee-kapsarc.github.io/wpc-knowledge-sprint/)
 
